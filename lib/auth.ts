@@ -1,12 +1,16 @@
 import { createHmac, timingSafeEqual } from 'crypto';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { isDemo } from './supabase';
 
 const COOKIE = 'admin_session';
 const MAX_AGE_S = 7 * 24 * 3600;
 
+/** En mode démo (développement sans configuration), le mot de passe est « demo ». */
+export const DEMO_PASSWORD = 'demo';
+
 function secret(): string {
-  const s = process.env.SESSION_SECRET;
+  const s = process.env.SESSION_SECRET || (isDemo ? 'secret-de-demo-uniquement-pour-le-developpement' : '');
   if (!s || s.length < 32) throw new Error('SESSION_SECRET doit faire au moins 32 caractères.');
   return s;
 }
@@ -22,7 +26,7 @@ function safeEqual(a: string, b: string): boolean {
 }
 
 export function checkPassword(password: string): boolean {
-  const expected = process.env.ADMIN_PASSWORD;
+  const expected = process.env.ADMIN_PASSWORD || (isDemo ? DEMO_PASSWORD : '');
   if (!expected) return false;
   // Comparaison des empreintes : même longueur, temps constant.
   return safeEqual(sign(`pw:${password}`), sign(`pw:${expected}`));
