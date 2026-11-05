@@ -20,6 +20,12 @@ export function addDaysStr(date: string, n: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** Lundi de la semaine d'une date YYYY-MM-DD. */
+export function mondayOf(date: string): string {
+  const weekday = new Date(`${date}T12:00:00Z`).getUTCDay(); // 0 = dimanche
+  return addDaysStr(date, weekday === 0 ? -6 : 1 - weekday);
+}
+
 export function isDateStr(s: unknown): s is string {
   return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s);
 }

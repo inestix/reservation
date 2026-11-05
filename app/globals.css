@@ -1,14 +1,18 @@
 :root {
+  /* Charte : beige (fond), vert 2 (éléments mis en avant), vert 3 (textes) */
   --bg: #f6f7f5;
   --card: #ffffff;
-  --text: #1c2321;
-  --muted: #66706c;
+  --text: #172c27;
+  --muted: #5b6a65;
   --border: #dde2df;
-  --accent: #0f766e;
-  --accent-soft: #e3f2ef;
+  --accent: #2e8b7b;
+  --accent-soft: #e1ece4;
   --danger: #b42318;
   --danger-soft: #fdecea;
   --radius: 12px;
+  /* Futura si installée (Mac, iPhone), sinon Jost, sa cousine gratuite */
+  --font-body: Futura, 'Futura PT', var(--font-jost), 'Century Gothic', sans-serif;
+  --font-title: var(--font-montserrat), 'Montserrat', sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -17,12 +21,12 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 { line-height: 1.2; margin: 0 0 .5rem; }
+h1, h2, h3, h4 { font-family: var(--font-title); font-weight: 700; line-height: 1.2; margin: 0 0 .5rem; }
 h1 { font-size: 1.75rem; }
 h2 { font-size: 1.25rem; }
 h3 { font-size: 1.05rem; margin-top: .5rem; }
@@ -59,7 +63,7 @@ input, select, textarea {
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
-  background: #fff;
+  background: var(--card);
   color: var(--text);
   width: 100%;
 }
@@ -73,7 +77,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px s
   padding: 10px 16px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--card);
   color: var(--text);
   cursor: pointer;
   text-decoration: none;
@@ -88,14 +92,15 @@ input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px s
 .link { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; }
 
 /* ----- Page client ----- */
-.hero { margin-bottom: 20px; }
-.eyebrow { text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; color: var(--accent); font-weight: 600; margin: 0 0 4px; }
+.hero { padding-top: 56px; margin-bottom: 28px; }
+@media (max-width: 600px) { .hero { padding-top: 32px; } }
+.eyebrow { text-transform: uppercase; letter-spacing: .12em; font-size: .8rem; color: var(--accent); font-weight: 600; margin: 0 0 10px; }
 
 .stepper { list-style: none; display: flex; gap: 8px; padding: 0; margin: 0; flex-wrap: wrap; }
 .stepper li { font-size: .85rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
 .stepper li span {
   width: 22px; height: 22px; border-radius: 50%; display: inline-grid; place-items: center;
-  border: 1px solid var(--border); font-size: .75rem; background: #fff;
+  border: 1px solid var(--border); font-size: .75rem; background: var(--card);
 }
 .stepper li.current { color: var(--text); font-weight: 600; }
 .stepper li.current span { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -117,7 +122,7 @@ input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px s
 .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 8px; }
 .slot {
   font: inherit; padding: 8px 0; border-radius: 8px; border: 1px solid var(--border);
-  background: #fff; cursor: pointer; font-variant-numeric: tabular-nums;
+  background: var(--card); cursor: pointer; font-variant-numeric: tabular-nums;
 }
 .slot:hover, .slot.selected { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import { addDaysStr, dayKey, formatDateStr, formatDayLong, formatTime, todayParis } from '@/lib/dates';
+import { addDaysStr, dayKey, formatDateStr, formatDayLong, formatTime, mondayOf, todayParis } from '@/lib/dates';
 import { LOCATIONS, LOCATION_LABELS, formatPrice, type LocationType, type Service } from '@/lib/types';
 
 type Step = 1 | 2 | 3 | 4 | 5;
@@ -18,7 +18,8 @@ export default function BookingFlow({
   const [service, setService] = useState<Service | null>(null);
   const [location, setLocation] = useState<LocationType>('cabinet');
   const [address, setAddress] = useState('');
-  const [weekStart, setWeekStart] = useState(todayParis());
+  // Semaines affichées du lundi au dimanche
+  const [weekStart, setWeekStart] = useState(() => mondayOf(todayParis()));
   const [slots, setSlots] = useState<string[] | null>(null);
   const [slotError, setSlotError] = useState('');
   const [slot, setSlot] = useState<string | null>(null);
@@ -213,8 +214,8 @@ export default function BookingFlow({
           <div className="row between week-nav">
             <button
               className="btn small"
-              disabled={weekStart <= todayParis()}
-              onClick={() => setWeekStart(addDaysStr(weekStart, -7) < todayParis() ? todayParis() : addDaysStr(weekStart, -7))}
+              disabled={weekStart <= mondayOf(todayParis())}
+              onClick={() => setWeekStart(addDaysStr(weekStart, -7))}
             >
               ← Précédent
             </button>
