@@ -154,3 +154,5 @@ input:focus, select:focus, textarea:focus, button:focus-visible { outline: 2px s
   background: #fef3c7; color: #78350f; text-align: center; font-size: .85rem;
   padding: 6px 16px; border-bottom: 1px solid #fcd34d;
 }
+.option.disabled { opacity: .55; cursor: not-allowed; }
+.option.disabled:hover { border-color: var(--border); }

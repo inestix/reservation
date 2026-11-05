@@ -5,7 +5,7 @@ import { addDaysStr, dayKey, formatDateStr, formatDayLong, formatTime, todayPari
 import { LOCATIONS, LOCATION_LABELS, formatPrice, type LocationType, type Service } from '@/lib/types';
 
 type Step = 1 | 2 | 3 | 4 | 5;
-const STEP_LABELS = ['Prestation', 'Lieu', 'Créneau', 'Coordonnées'];
+const STEP_LABELS = ['Prestation', 'Créneau', 'Lieu', 'Coordonnées'];
 
 export default function BookingFlow({
   services,
@@ -26,13 +26,16 @@ export default function BookingFlow({
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [reload, setReload] = useState(0);
+  // Le créneau choisi laisse-t-il le temps de trajet (domicile / club) ? null = vérification en cours
+  const [offsiteOk, setOffsiteOk] = useState<boolean | null>(null);
 
+  // Étape Créneau : créneaux libres (calculés sans trajet, comme au cabinet)
   useEffect(() => {
-    if (step !== 3 || !service) return;
+    if (step !== 2 || !service) return;
     let cancelled = false;
     setSlots(null);
     setSlotError('');
-    const qs = new URLSearchParams({ service: service.id, location, from: weekStart, days: '7' });
+    const qs = new URLSearchParams({ service: service.id, location: 'cabinet', from: weekStart, days: '7' });
     fetch(`/api/slots?${qs}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => !cancelled && setSlots(d.slots))
@@ -40,7 +43,27 @@ export default function BookingFlow({
     return () => {
       cancelled = true;
     };
-  }, [step, service, location, weekStart, reload]);
+  }, [step, service, weekStart, reload]);
+
+  // Étape Lieu : vérifie si le créneau choisi permet aussi un déplacement (trajet avant/après)
+  useEffect(() => {
+    if (step !== 3 || !service || !slot) return;
+    let cancelled = false;
+    setOffsiteOk(null);
+    const qs = new URLSearchParams({ service: service.id, location: 'domicile', from: dayKey(slot), days: '1' });
+    fetch(`/api/slots?${qs}`)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d) => {
+        if (cancelled) return;
+        const ok = (d.slots as string[]).includes(slot);
+        setOffsiteOk(ok);
+        if (!ok) setLocation('cabinet');
+      })
+      .catch(() => !cancelled && setOffsiteOk(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [step, service, slot]);
 
   const days = useMemo(() => {
     const map = new Map<string, string[]>();
@@ -66,7 +89,7 @@ export default function BookingFlow({
       } else if (res.status === 409) {
         setSlot(null);
         setReload((n) => n + 1);
-        setStep(3);
+        setStep(2);
         setSlotError(data.error ?? 'Ce créneau n’est plus disponible.');
       } else {
         setError(data.error ?? 'Une erreur est survenue.');
@@ -133,26 +156,36 @@ export default function BookingFlow({
         </section>
       )}
 
-      {step === 2 && (
+      {step === 3 && slot && (
         <section className="stack-sm">
           <h2>Où se déroule la séance ?</h2>
-          {LOCATIONS.map((l) => (
-            <label key={l} className={`option ${location === l ? 'selected' : ''}`}>
-              <input
-                type="radio"
-                name="location"
-                checked={location === l}
-                onChange={() => {
-                  setLocation(l);
-                  setSlot(null);
-                }}
-              />
-              <div className="grow">
-                <strong>{LOCATION_LABELS[l]}</strong>
-                {l === 'cabinet' && cabinetAddress && <div className="muted small">{cabinetAddress}</div>}
-              </div>
-            </label>
-          ))}
+          <p className="muted small">
+            {formatDayLong(slot)} à {formatTime(slot)}
+          </p>
+          {LOCATIONS.map((l) => {
+            const disabled = l !== 'cabinet' && offsiteOk !== true;
+            return (
+              <label key={l} className={`option ${location === l ? 'selected' : ''} ${disabled ? 'disabled' : ''}`}>
+                <input
+                  type="radio"
+                  name="location"
+                  checked={location === l}
+                  disabled={disabled}
+                  onChange={() => setLocation(l)}
+                />
+                <div className="grow">
+                  <strong>{LOCATION_LABELS[l]}</strong>
+                  {l === 'cabinet' && cabinetAddress && <div className="muted small">{cabinetAddress}</div>}
+                  {l !== 'cabinet' && offsiteOk === null && <div className="muted small">Vérification…</div>}
+                  {l !== 'cabinet' && offsiteOk === false && (
+                    <div className="muted small">
+                      Pas possible sur cet horaire (temps de trajet). Choisissez un autre créneau.
+                    </div>
+                  )}
+                </div>
+              </label>
+            );
+          })}
           {location !== 'cabinet' && (
             <label>
               {location === 'domicile' ? 'Votre adresse' : 'Nom et adresse du club / lieu'}
@@ -160,21 +193,21 @@ export default function BookingFlow({
             </label>
           )}
           <div className="row between">
-            <button className="btn" onClick={() => setStep(1)}>
+            <button className="btn" onClick={() => setStep(2)}>
               ← Retour
             </button>
             <button
               className="btn primary"
               disabled={location !== 'cabinet' && address.trim().length < 5}
-              onClick={() => setStep(3)}
+              onClick={() => setStep(4)}
             >
-              Voir les créneaux →
+              Continuer →
             </button>
           </div>
         </section>
       )}
 
-      {step === 3 && (
+      {step === 2 && (
         <section className="stack-sm">
           <h2>Choisissez un créneau</h2>
           <div className="row between week-nav">
@@ -216,7 +249,7 @@ export default function BookingFlow({
                           className={`slot ${slot === s ? 'selected' : ''}`}
                           onClick={() => {
                             setSlot(s);
-                            setStep(4);
+                            setStep(3);
                           }}
                         >
                           {formatTime(s)}
@@ -228,7 +261,7 @@ export default function BookingFlow({
             </div>
           )}
           <div>
-            <button className="btn" onClick={() => setStep(2)}>
+            <button className="btn" onClick={() => setStep(1)}>
               ← Retour
             </button>
           </div>
@@ -270,7 +303,7 @@ export default function BookingFlow({
           {error && <p className="error">{error}</p>}
           <div className="row between">
             <button type="button" className="btn" onClick={() => setStep(3)}>
-              ← Changer de créneau
+              ← Retour
             </button>
             <button className="btn primary" disabled={submitting}>
               {submitting ? 'Réservation…' : 'Confirmer la réservation'}

@@ -1,3 +1,4 @@
+import nodemailer, { type Transporter } from 'nodemailer';
 import { formatDayLong, formatTime } from './dates';
 import { LOCATION_LABELS, formatPrice, type Booking, type Service, type Settings } from './types';
 
@@ -7,11 +8,40 @@ export function esc(s: string | null | undefined): string {
   );
 }
 
+let gmail: Transporter | null = null;
+
+/**
+ * Envoi d'un email, par ordre de priorité :
+ * 1. Gmail (GMAIL_USER + GMAIL_APP_PASSWORD)
+ * 2. Resend (RESEND_API_KEY + EMAIL_FROM)
+ * 3. sinon, simple message dans la console
+ */
 async function sendEmail(to: string, subject: string, html: string, replyTo?: string | null) {
+  const gmailUser = process.env.GMAIL_USER;
+  const gmailPass = process.env.GMAIL_APP_PASSWORD;
+  if (gmailUser && gmailPass) {
+    try {
+      gmail ??= nodemailer.createTransport({
+        service: 'gmail',
+        auth: { user: gmailUser, pass: gmailPass.replace(/\s/g, '') },
+      });
+      await gmail.sendMail({
+        from: { name: process.env.EMAIL_FROM_NAME || 'Réservation massage sportif', address: gmailUser },
+        to,
+        subject,
+        html,
+        ...(replyTo ? { replyTo } : {}),
+      });
+    } catch (e) {
+      console.error("Échec de l'envoi d'email (Gmail)", e);
+    }
+    return;
+  }
+
   const key = process.env.RESEND_API_KEY;
   const from = process.env.EMAIL_FROM;
   if (!key || !from) {
-    console.log(`[email non envoyé — RESEND_API_KEY/EMAIL_FROM manquants] à ${to} : ${subject}`);
+    console.log(`[email non envoyé — aucun service d'email configuré] à ${to} : ${subject}`);
     return;
   }
   try {
