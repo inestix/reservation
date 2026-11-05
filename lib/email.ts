@@ -26,7 +26,7 @@ async function sendEmail(to: string, subject: string, html: string, replyTo?: st
         auth: { user: gmailUser, pass: gmailPass.replace(/\s/g, '') },
       });
       await gmail.sendMail({
-        from: { name: process.env.EMAIL_FROM_NAME || 'Réservation massage sportif', address: gmailUser },
+        from: { name: process.env.EMAIL_FROM_NAME || 'Médecine chinoise & massage sportif', address: gmailUser },
         to,
         subject,
         html,

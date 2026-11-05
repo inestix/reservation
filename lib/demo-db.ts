@@ -14,9 +14,10 @@ type Result = { data: any; error: any };
 function seed(): Store {
   const now = new Date().toISOString();
   const services: Row[] = [
-    { id: randomUUID(), name: 'Massage récupération', description: 'Après l’effort : relâchement musculaire et récupération.', duration_min: 45, price_cents: 5000, active: true, sort: 1, created_at: now },
-    { id: randomUUID(), name: 'Préparation compétition', description: 'Massage dynamique d’avant-épreuve.', duration_min: 30, price_cents: 4000, active: true, sort: 2, created_at: now },
-    { id: randomUUID(), name: 'Massage sportif profond', description: 'Travail en profondeur sur les tensions et contractures.', duration_min: 60, price_cents: 6500, active: true, sort: 3, created_at: now },
+    { id: randomUUID(), name: 'Massage Tuina', description: 'Massage traditionnel chinois qui dénoue les tensions et rééquilibre l’énergie du corps.', duration_min: 60, price_cents: 7000, active: true, sort: 1, created_at: now },
+    { id: randomUUID(), name: 'Acupuncture', description: 'Stimulation de points précis par de fines aiguilles pour soulager douleurs et blocages.', duration_min: 60, price_cents: 7500, active: true, sort: 2, created_at: now },
+    { id: randomUUID(), name: 'Ventouses', description: 'Les ventouses activent la circulation et relâchent les muscles contractés.', duration_min: 30, price_cents: 4000, active: true, sort: 3, created_at: now },
+    { id: randomUUID(), name: 'Massage sportif profond', description: 'Travail en profondeur sur les tensions et contractures musculaires.', duration_min: 45, price_cents: 5000, active: true, sort: 4, created_at: now },
   ];
 
   const availability: Row[] = [];

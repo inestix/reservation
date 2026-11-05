@@ -3,7 +3,7 @@ import { isDemo } from '@/lib/supabase';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Réserver une séance de massage sportif',
+  title: 'Réserver une séance — Médecine chinoise & massage sportif',
   description: 'Choisissez votre prestation et votre créneau en ligne.',
 };
 

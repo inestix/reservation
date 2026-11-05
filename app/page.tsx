@@ -31,7 +31,7 @@ export default async function Home() {
   return (
     <main className="container narrow">
       <header className="hero">
-        <p className="eyebrow">Massage sportif</p>
+        <p className="eyebrow">Médecine chinoise &amp; massage sportif</p>
         <h1>Réserver une séance</h1>
         {settings.practitioner_name && <p className="muted">avec {settings.practitioner_name}</p>}
       </header>

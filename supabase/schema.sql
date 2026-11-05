@@ -73,8 +73,9 @@ alter table settings enable row level security;
 -- Prestations d'exemple (modifiables ensuite dans /admin)
 insert into services (name, description, duration_min, price_cents, sort)
 select * from (values
-  ('Massage récupération', 'Après l''effort : relâchement musculaire et récupération.', 45, 5000, 1),
-  ('Préparation compétition', 'Massage dynamique d''avant-épreuve.', 30, 4000, 2),
-  ('Massage sportif profond', 'Travail en profondeur sur les tensions et contractures.', 60, 6500, 3)
+  ('Massage Tuina', 'Massage traditionnel chinois qui dénoue les tensions et rééquilibre l''énergie du corps.', 60, 7000, 1),
+  ('Acupuncture', 'Stimulation de points précis par de fines aiguilles pour soulager douleurs et blocages.', 60, 7500, 2),
+  ('Ventouses', 'Les ventouses activent la circulation et relâchent les muscles contractés.', 30, 4000, 3),
+  ('Massage sportif profond', 'Travail en profondeur sur les tensions et contractures musculaires.', 45, 5000, 4)
 ) as v(name, description, duration_min, price_cents, sort)
 where not exists (select 1 from services);
